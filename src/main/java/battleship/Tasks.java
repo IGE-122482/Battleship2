@@ -32,7 +32,11 @@ public class Tasks {
 	private static final String MAPA = "mapa";
 	private static final String STATUS = "estado";
 	private static final String SIMULA = "simula";
+
 	private static final String GUARDAR = "guardar";
+
+	private static final String ESTATISTICAS = "estatisticas";
+
 
 	/**
 	 * This task also tests the fighting element of a round of three shots
@@ -127,6 +131,10 @@ public class Tasks {
 					if (game != null)
 						game.printMyBoard(true, true);
 					break;
+				case ESTATISTICAS:
+					if (game != null)
+						game.printStatistics();
+					break;
                 case AJUDA:
                     menuHelp();
                     break;
@@ -154,6 +162,7 @@ public class Tasks {
 		System.out.println("- " + GUARDAR + ": Guarda os resultados da simulação em JSON.");
 		System.out.println("- " + TIROS + ": Lista os tiros válidos realizados (* = tiro em navio, o = tiro na água)");
 		System.out.println("- " + DESISTIR + ": Encerra o jogo.");
+		System.out.println("- " + ESTATISTICAS + ": estatisticas: Mostra estatísticas da simulação.");
 		System.out.println("===============================================================");
 	}
 	/**
