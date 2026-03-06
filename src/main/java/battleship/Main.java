@@ -10,6 +10,7 @@ package battleship;
  * @author adrianolopes
  * @author miguelgoulao
  */
+
 public class Main
 {
 	/**
