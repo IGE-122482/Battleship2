@@ -3,6 +3,7 @@ package battleship;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import java.util.*;
 
@@ -88,6 +89,38 @@ public class Game implements IGame
 		}
 		System.out.println();
 	}
+
+	public void printStatistics() {
+
+		int totalShots = 0;
+
+		DescriptiveStatistics stats = new DescriptiveStatistics();
+
+		for (IMove move : alienMoves) {
+			int shotsInMove = move.getShots().size();
+			totalShots += shotsInMove;
+			stats.addValue(shotsInMove);
+		}
+
+		double hitRate = 0.0;
+
+		if (totalShots > 0) {
+			hitRate = ((double) countHits / totalShots) * 100;
+		}
+
+		double averageShots = stats.getMean();
+
+		System.out.println();
+		System.out.println("=========== ESTATÍSTICAS DO JOGO ===========");
+		System.out.println("Total de tiros: " + totalShots);
+		System.out.println("Número de acertos: " + countHits);
+		System.out.printf("Taxa de acerto: %.2f%%\n", hitRate);
+		System.out.println("Navios afundados: " + countSinks);
+		System.out.printf("Média de tiros por jogada: %.2f\n", averageShots);
+		System.out.println("============================================");
+		System.out.println();
+	}
+
 
 	/**
 	 * Serializes a list of shot positions into a JSON string. Each shot is represented
