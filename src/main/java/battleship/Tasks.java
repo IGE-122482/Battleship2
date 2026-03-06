@@ -32,6 +32,7 @@ public class Tasks {
 	private static final String MAPA = "mapa";
 	private static final String STATUS = "estado";
 	private static final String SIMULA = "simula";
+	private static final String GUARDAR = "guardar";
 
 	/**
 	 * This task also tests the fighting element of a round of three shots
@@ -97,6 +98,31 @@ public class Tasks {
 						}
 					}
 					break;
+				case GUARDAR:
+					if (game != null) {
+
+						int tiros = 0;
+
+						for (IMove move : game.getAlienMoves()) {
+							tiros += move.getShots().size();
+						}
+
+						for (IMove move : game.getMyMoves()) {
+							tiros += move.getShots().size();
+						}
+
+						int acertos = game.getHits();
+						int naviosAfundados = game.getSunkShips();
+
+						ResultadoJogo resultado = new ResultadoJogo(
+								tiros,
+								acertos,
+								naviosAfundados
+						);
+
+						ExportadorResultados.guardarResultado(resultado);
+					}
+					break;
 				case TIROS:
 					if (game != null)
 						game.printMyBoard(true, true);
@@ -125,6 +151,7 @@ public class Tasks {
 		System.out.println("- " + MAPA + ": Exibe o mapa da frota.");
 		System.out.println("- " + RAJADA + ": Realiza uma rajada de disparos.");
 		System.out.println("- " + SIMULA + ": Simula um jogo completo.");
+		System.out.println("- " + GUARDAR + ": Guarda os resultados da simulação em JSON.");
 		System.out.println("- " + TIROS + ": Lista os tiros válidos realizados (* = tiro em navio, o = tiro na água)");
 		System.out.println("- " + DESISTIR + ": Encerra o jogo.");
 		System.out.println("===============================================================");
