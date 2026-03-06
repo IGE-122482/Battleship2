@@ -46,6 +46,9 @@ public interface IGame
 	 */
 	ShotResult fireSingleShot(IPosition pos, boolean isRepeated);
 
+
+
+
 	/**
 	 * Gets my fleet.
 	 *
@@ -118,6 +121,15 @@ public interface IGame
 	 * Print the alien board (alien fleet + my shots).
 	 */
 	void printAlienBoard(boolean show_shots, boolean show_legend);
+
+
+	/**
+	 * Prints statistical information about the current game simulation.
+	 *
+	 * This method calculates and displays several performance metrics
+	 * related to the shots fired during the game.
+	 */
+	void printStatistics();
 
 	void over();
 }
