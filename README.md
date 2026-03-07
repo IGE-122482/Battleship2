@@ -7,6 +7,9 @@
 > A modern take on the classic naval warfare game, designed for the XVII century setting with updated software engineering patterns.
 
 ---
+## Vídeo de Demonstração:
+https://youtu.be/nd_s4hNQ8LY
+
 ## Pergunta Teórica
 Pergunta: 2.Veja o ficheiro pom.xml que declara várias dependências diretas. O Maven vai descarregá-las,
 bem como as indiretas (transitivas), geralmente em maior número que as primeiras. Como é
