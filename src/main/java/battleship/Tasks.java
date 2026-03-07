@@ -71,17 +71,6 @@ public class Tasks {
 					break;
 				case RAJADA:
 					if (game != null) {
-
-						boolean validShots = false;
-						while (!validShots) {
-							try {
-								game.readEnemyFire(in); // Já valida cada tiro e mostra mensagem se inválido
-								validShots = true;      // Sai do loop se 3 tiros válidos forem inseridos
-							} catch (IllegalArgumentException e) {
-								System.out.println(e.getMessage());
-								System.out.println("Tente novamente o comando rajada com 3 posições válidas.");
-							}
-						}
 						((Game) game).startMoveTimer();
 						game.readEnemyFire(in);
 						((Game) game).endMoveTimer();
@@ -95,6 +84,7 @@ public class Tasks {
 						}
 					}
 					break;
+
 				case TEMPOS:
 					if (game != null)
 						((Game) game).printMoveTimes();

@@ -15,7 +15,7 @@ public class Main
 	/**
 	 * Main.
 	 *
-	 * @param args the args
+	 * @param args the argsger
 	 */
 	public static void main(String[] args)
     {
