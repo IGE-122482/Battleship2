@@ -7,6 +7,20 @@
 > A modern take on the classic naval warfare game, designed for the XVII century setting with updated software engineering patterns.
 
 ---
+## Pergunta Teórica
+Pergunta: 2.Veja o ficheiro pom.xml que declara várias dependências diretas. O Maven vai descarregá-las,
+bem como as indiretas (transitivas), geralmente em maior número que as primeiras. Como é
+que o Maven descobre quais são as dependências transitivas? Quando compilar o programa pela
+primeira vez, são todas descarregadas para o repositório local, sendo as próximas compilações
+mais rápidas. Porquê?
+
+Resposta: O Maven descobre as dependências transitivas lendo o POM de cada dependência direta, que lista as bibliotecas de que ela depende. Na primeira compilação, todas as dependências (diretas e transitivas) são descarregadas do repositório remoto para o repositório local porque ainda não existem localmente. Nas compilações seguintes, o Maven utiliza os arquivos já presentes no repositório local, o que torna a compilação mais rápida.
+
+
+
+
+
+
 
 ## 📖 Table of Contents
 - [Project Overview](#-project-overview)

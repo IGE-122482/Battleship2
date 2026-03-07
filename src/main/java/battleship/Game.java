@@ -5,6 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
+
+import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 
 public class Game implements IGame
@@ -190,6 +193,9 @@ public class Game implements IGame
 	private Integer countSinks;
 	private int moveNumber;
 
+	// Variáveis do relógio
+	private Instant startMoveTime;             // início da jogada atual
+	private List<Duration> moveDurations;     // tempos das jogadas passadas
 	//------------------------------------------------------------------
 	public Game(IFleet myFleet)
 	{
@@ -205,6 +211,20 @@ public class Game implements IGame
 		this.countRepeatedShots = 0;
 		this.countHits = 0;
 		this.countSinks = 0;
+		this.moveDurations = new ArrayList<>();
+	}
+	public void printMoveTimes() {
+		System.out.println("===== TEMPO DAS JOGADAS =====");
+		for (int i = 0; i < moveDurations.size(); i++) {
+			double tempo = moveDurations.get(i).toMillis() / 1000.0;
+			System.out.printf("Jogada %d: %.3f segundos%n", i + 1, tempo);
+		}
+	}
+	// Exemplo de jogada do jogador
+	public void playMyMove(List<IPosition> shots) {
+		startMoveTimer();       // inicia o relógio da jogada
+		fireShots(shots);       // executa os tiros
+		endMoveTimer();         // finaliza o relógio e mostra o tempo
 	}
 
 	@Override
@@ -382,6 +402,10 @@ public class Game implements IGame
 	 * @throws IllegalArgumentException if the list of shots is null, contains an invalid
 	 *                                  number of positions, or includes duplicate positions.
 	 */
+	// Chamar no início de cada jogada
+	public void startMoveTimer() {
+		startMoveTime = Instant.now();
+	}
 	public void fireShots(List<IPosition> shots)
 	{
 		assert shots != null;
@@ -406,6 +430,17 @@ public class Game implements IGame
 		alienMoves.add(move);
 
 		moveNumber++;
+	}
+	// Chamar no fim da jogada para calcular o tempo
+	public void endMoveTimer() {
+		if (startMoveTime != null) {
+			Duration duration = Duration.between(startMoveTime, Instant.now());
+			moveDurations.add(duration);
+
+			// ✅ novo cálculo em segundos com casas decimais
+			double tempo = duration.toMillis() / 1000.0;
+			System.out.printf("Tempo da jogada %d: %.3f segundos%n", moveNumber, tempo);
+		}
 	}
 
 	/**
@@ -503,4 +538,5 @@ public class Game implements IGame
 			System.out.println("| Maldito sejas, Java Sparrow, eu voltarei, glub glub glub ... |");
 			System.out.println("+--------------------------------------------------------------+");
 	}
+
 }

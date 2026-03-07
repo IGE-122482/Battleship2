@@ -32,6 +32,7 @@ public class Tasks {
 	private static final String MAPA = "mapa";
 	private static final String STATUS = "estado";
 	private static final String SIMULA = "simula";
+	private static final String TEMPOS = "tempos";
 	private static final String GUARDAR = "guardar";
 	private static final String ESTATISTICAS = "estatisticas";
 
@@ -70,6 +71,7 @@ public class Tasks {
 					break;
 				case RAJADA:
 					if (game != null) {
+
 						boolean validShots = false;
 						while (!validShots) {
 							try {
@@ -80,6 +82,10 @@ public class Tasks {
 								System.out.println("Tente novamente o comando rajada com 3 posições válidas.");
 							}
 						}
+						((Game) game).startMoveTimer();
+						game.readEnemyFire(in);
+						((Game) game).endMoveTimer();
+
 						myFleet.printStatus();
 						game.printMyBoard(true, false);
 
@@ -89,16 +95,25 @@ public class Tasks {
 						}
 					}
 					break;
+				case TEMPOS:
+					if (game != null)
+						((Game) game).printMoveTimes();
+					break;
 				case SIMULA:
 					if (game != null) {
 						while (game.getRemainingShips() > 0){
+
+							((Game) game).startMoveTimer();
 							game.randomEnemyFire();
+							((Game) game).endMoveTimer();
+
 							myFleet.printStatus();
 							game.printMyBoard(true, false);
+
 							try {
 								Thread.sleep(3000);
 							} catch (InterruptedException e) {
-								Thread.currentThread().interrupt(); // Best practice: restore interrupt status
+								Thread.currentThread().interrupt();
 							}
 						}
 
@@ -170,6 +185,7 @@ public class Tasks {
 		System.out.println("- " + TIROS + ": Lista os tiros válidos realizados (* = tiro em navio, o = tiro na água)");
 		System.out.println("- " + DESISTIR + ": Encerra o jogo.");
 		System.out.println("- " + ESTATISTICAS + ": Mostra estatísticas da simulação.");
+		System.out.println("- " + TEMPOS + ": Mostra o tempo gasto em cada jogada.");
 		System.out.println("===============================================================");
 	}
 	/**
