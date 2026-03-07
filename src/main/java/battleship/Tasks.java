@@ -71,10 +71,21 @@ public class Tasks {
 					break;
 				case RAJADA:
 					if (game != null) {
-						((Game) game).startMoveTimer();
-						game.readEnemyFire(in);
-						((Game) game).endMoveTimer();
+						((Game) game).startMoveTimer(); // Inicia contagem de tempo
+						boolean validMove = false;
 
+						// Loop até o jogador inserir 3 tiros válidos
+						while (!validMove) {
+							try {
+								game.readEnemyFire(in); // Já mostra histórico do turno e mensagens de inválido/válido
+								validMove = true;
+							} catch (IllegalArgumentException e) {
+								System.out.println(e.getMessage());
+								System.out.println("Tente novamente o comando rajada com 3 posições válidas.");
+							}
+						}
+
+						((Game) game).endMoveTimer(); // Termina contagem de tempo
 						myFleet.printStatus();
 						game.printMyBoard(true, false);
 
