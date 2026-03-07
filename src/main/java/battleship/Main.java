@@ -2,7 +2,6 @@
  * 
  */
 package battleship;
-
 /**
  * The type Main.
  *
@@ -21,7 +20,6 @@ public class Main
 	public static void main(String[] args)
     {
 		System.out.println("***  Battleship  ***");
-
 		Tasks.menu();
     }
 }
