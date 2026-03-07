@@ -330,22 +330,57 @@ public class Game implements IGame
 		List<IPosition> shots = new ArrayList<>();
 		Scanner inputScanner = new Scanner(input);
 
+		int shotNumber = 1; // Para mostrar mensagens por tiro
+		StringBuilder turnHistory = new StringBuilder("\n=== Histórico do turno ===\n");
+
 		while (shots.size() < NUMBER_SHOTS && inputScanner.hasNext()) {
 			String token = inputScanner.next();
+			IPosition pos;
 
-			if (token.matches("[A-Za-z]")) {
-				if (inputScanner.hasNextInt()) {
-					int row = inputScanner.nextInt();
-					shots.add(new Position(token.toUpperCase().charAt(0), row));
+			try {
+				// Constrói a posição
+				if (token.matches("[A-Za-z]")) {
+					if (inputScanner.hasNextInt()) {
+						int row = inputScanner.nextInt();
+						pos = new Position(token.toUpperCase().charAt(0), row);
+					} else {
+						turnHistory.append("Tiro ").append(shotNumber)
+								.append(": Posição incompleta! A coluna '").append(token).append("' não é seguida por uma linha.\n");
+						continue;
+					}
+				} else {
+					Scanner singleScanner = new Scanner(token);
+					pos = Tasks.readClassicPosition(singleScanner);
 				}
-			} else {
-				Scanner singleScanner = new Scanner(token);
-				shots.add(Tasks.readClassicPosition(singleScanner));
+
+				// Validação da posição
+				if (!pos.isInside()) {
+					turnHistory.append("Tiro ").append(shotNumber)
+							.append(": Jogada inválida! Esta posição está fora da grelha: ").append(pos).append("\n");
+					continue;
+				}
+				if (repeatedShot(pos)) {
+					turnHistory.append("Tiro ").append(shotNumber)
+							.append(": Jogada inválida! Esta posição já foi usada: ").append(pos).append("\n");
+					continue;
+				}
+
+				// Tiro válido
+				shots.add(pos);
+				turnHistory.append("Tiro ").append(shotNumber)
+						.append(": VÁLIDO -> ").append(pos).append("\n");
+				shotNumber++;
+
+			} catch (IllegalArgumentException e) {
 			}
 		}
 
+		// Mostrar histórico do turno antes de disparar
+		System.out.println(turnHistory);
+
+		// Verifica se temos exatamente NUMBER_SHOTS válidos
 		if (shots.size() != NUMBER_SHOTS) {
-			throw new IllegalArgumentException("Você deve inserir exatamente " + NUMBER_SHOTS + " posições!");
+			throw new IllegalArgumentException("Você deve inserir exatamente " + NUMBER_SHOTS + " posições válidas!");
 		}
 
 		this.fireShots(shots);
