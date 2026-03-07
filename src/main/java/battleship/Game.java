@@ -327,36 +327,66 @@ public class Game implements IGame
 		assert in != null;
 
 		String input = in.nextLine().trim();
-
-		// Criar lista para armazenar os tiros
 		List<IPosition> shots = new ArrayList<>();
-
 		Scanner inputScanner = new Scanner(input);
-		while (shots.size() < NUMBER_SHOTS && inputScanner.hasNext()) {
-			// Lê a próxima parte e constrói uma posição
-			String token = inputScanner.next();
 
+		int shotNumber = 1; // Para mostrar mensagens por tiro
+
+		// Lista temporária para histórico do turno
+		StringBuilder turnHistory = new StringBuilder("\n=== Histórico do turno ===\n");
+
+		while (shots.size() < NUMBER_SHOTS && inputScanner.hasNext()) {
+			String token = inputScanner.next();
+			IPosition pos;
+
+			// Constrói a posição
 			if (token.matches("[A-Za-z]")) {
-				// Caso seja somente uma coluna ("A", "B", etc.), esperar o próximo número
 				if (inputScanner.hasNextInt()) {
 					int row = inputScanner.nextInt();
-					shots.add(new Position(token.toUpperCase().charAt(0), row));
+					pos = new Position(token.toUpperCase().charAt(0), row);
 				} else {
-					throw new IllegalArgumentException("Posição incompleta! A coluna '" + token + "' não é seguida por uma linha.");
+					turnHistory.append("Tiro ").append(shotNumber)
+							.append(": Posição incompleta! A coluna '").append(token).append("' não é seguida por uma linha.\n");
+					continue;
 				}
 			} else {
-				// Caso o token já contenha a coluna e a linha juntas (ex.: "A3")
 				Scanner singleScanner = new Scanner(token);
-				shots.add(Tasks.readClassicPosition(singleScanner));
+				try {
+					pos = Tasks.readClassicPosition(singleScanner);
+				} catch (IllegalArgumentException e) {
+					turnHistory.append("Tiro ").append(shotNumber)
+							.append(": Formato inválido: ").append(token).append("\n");
+					continue;
+				}
 			}
+
+			// Validação
+			if (!pos.isInside()) {
+				turnHistory.append("Tiro ").append(shotNumber)
+						.append(": Jogada inválida! Esta posição está fora da grelha: ").append(pos).append("\n");
+				continue;
+			}
+			if (repeatedShot(pos)) {
+				turnHistory.append("Tiro ").append(shotNumber)
+						.append(": Jogada inválida! Esta posição já foi usada: ").append(pos).append("\n");
+				continue;
+			}
+
+			// Tiro válido
+			shots.add(pos);
+			turnHistory.append("Tiro ").append(shotNumber)
+					.append(": VÁLIDO -> ").append(pos).append("\n");
+			shotNumber++;
 		}
 
+		// Mostrar o histórico do turno antes de disparar
+		System.out.println(turnHistory);
+
 		if (shots.size() != NUMBER_SHOTS) {
-			throw new IllegalArgumentException("Você deve inserir exatamente " + NUMBER_SHOTS + " posições!");
+			throw new IllegalArgumentException("Você deve inserir exatamente " + NUMBER_SHOTS + " posições válidas!");
 		}
 
 		this.fireShots(shots);
-
 		return Game.jsonShots(shots);
 	}
 
