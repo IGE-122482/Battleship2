@@ -311,77 +311,171 @@ public class Game implements IGame
 
 	/**
 	 * Reads and processes the enemy fire input from the specified scanner.
-	 * The method expects input describing positions for enemy shots. It verifies
-	 * the format, ensures the correct number of positions are provided, and then fires
-	 * on those positions.
+	 * Accepts a JSON object (possibly multi-line) in the format:
+	 * { "shots": [ {"row": "A", "column": 5}, ... ] }
 	 *
-	 * @param in the scanner object to read the enemy fire positions from, input must
-	 *           be formatted either as a single token combining the column and row
-	 *           (e.g., "A3") or as separate tokens (e.g., "A" followed by "3").
-	 * @throws IllegalArgumentException if the provided positions are incomplete,
-	 *                                  incorrectly formatted, or do not match the
-	 *                                  required number of shots (NUMBER_SHOTS).
+	 * @param in the scanner object to read the JSON input from.
 	 */
 	public String readEnemyFire(Scanner in) {
 
 		assert in != null;
 
-		String input = in.nextLine().trim();
-		List<IPosition> shots = new ArrayList<>();
-		Scanner inputScanner = new Scanner(input);
+		String firstLine = in.nextLine().trim();
 
-		int shotNumber = 1; // Para mostrar mensagens por tiro
+		// ── Detectar formato: JSON ({ ou [) ou texto simples (ex: "A1 A2 A3") ──
+		if (firstLine.startsWith("{") || firstLine.startsWith("[")) {
+			return readEnemyFireFromJson(firstLine, in);
+		} else {
+			return readEnemyFireFromText(firstLine, in);
+		}
+	}
+
+	// ─────────────────────────────────────────────────────────────────────────────
+// Leitura no formato JSON  →  {"shots":[...]}  ou  { [ ... ] }  (multi-linha)
+// ─────────────────────────────────────────────────────────────────────────────
+	private String readEnemyFireFromJson(String firstLine, Scanner in) {
+
+		// Acumular linhas até todas as chavetas/parênteses estarem fechados
+		StringBuilder rawBuilder = new StringBuilder(firstLine).append(" ");
+		int braceDepth = 0;
+		boolean started = false;
+
+		for (char c : firstLine.toCharArray()) {
+			if (c == '{' || c == '[') { braceDepth++; started = true; }
+			else if (c == '}' || c == ']') { braceDepth--; }
+		}
+
+		while (in.hasNextLine() && !(started && braceDepth == 0)) {
+			String line = in.nextLine();
+			rawBuilder.append(line).append(" ");
+			for (char c : line.toCharArray()) {
+				if (c == '{' || c == '[') { braceDepth++; started = true; }
+				else if (c == '}' || c == ']') { braceDepth--; }
+			}
+		}
+
+		String raw = rawBuilder.toString().trim();
+
+		// Extrair o array [...] de dentro do JSON
+		int arrayStart = raw.indexOf('[');
+		int arrayEnd   = raw.lastIndexOf(']');
+
+		String arrayJson;
+		if (arrayStart != -1 && arrayEnd != -1 && arrayEnd > arrayStart) {
+			arrayJson = raw.substring(arrayStart, arrayEnd + 1);
+		} else {
+			// O próprio raw pode já ser o array, ou tentar parsear o raw completo
+			arrayJson = raw;
+		}
+
+		ObjectMapper mapper = new ObjectMapper();
+		List<IPosition> shots = new ArrayList<>();
 		StringBuilder turnHistory = new StringBuilder("\n=== Histórico do turno ===\n");
 
-		while (shots.size() < NUMBER_SHOTS && inputScanner.hasNext()) {
-			String token = inputScanner.next();
+		try {
+			com.fasterxml.jackson.databind.JsonNode root = mapper.readTree(arrayJson);
+
+			// Suporta tanto [ {...}, {...} ] como { "shots": [ {...}, {...} ] }
+			com.fasterxml.jackson.databind.JsonNode shotsArray =
+					root.isArray() ? root : root.get("shots");
+
+			if (shotsArray == null || !shotsArray.isArray()) {
+				throw new IllegalArgumentException("JSON inválido: array de tiros não encontrado.");
+			}
+
+			int shotNumber = 1;
+			for (com.fasterxml.jackson.databind.JsonNode shotNode : shotsArray) {
+				String rowStr = shotNode.get("row").asText().toUpperCase();
+				int    column = shotNode.get("column").asInt();
+				IPosition pos = new Position(rowStr.charAt(0), column);
+
+				if (!pos.isInside()) {
+					turnHistory.append("Tiro ").append(shotNumber)
+							.append(": Fora do tabuleiro -> ").append(pos).append("\n");
+				} else if (repeatedShot(pos)) {
+					turnHistory.append("Tiro ").append(shotNumber)
+							.append(": Repetido -> ").append(pos).append("\n");
+				} else {
+					shots.add(pos);
+					turnHistory.append("Tiro ").append(shotNumber)
+							.append(": VÁLIDO -> ").append(pos).append("\n");
+				}
+				shotNumber++;
+			}
+
+		} catch (Exception e) {
+			throw new IllegalArgumentException("Erro ao ler JSON da rajada: " + e.getMessage());
+		}
+
+		return finalizeShotsAndFire(shots, turnHistory);
+	}
+
+	// ─────────────────────────────────────────────────────────────────────────────
+// Leitura no formato texto  →  "A1 B3 C5"  ou  "A 1 B 3 C 5"  (linha simples)
+// ─────────────────────────────────────────────────────────────────────────────
+	private String readEnemyFireFromText(String firstLine, Scanner in) {
+
+		List<IPosition> shots = new ArrayList<>();
+		StringBuilder turnHistory = new StringBuilder("\n=== Histórico do turno ===\n");
+
+		Scanner lineScanner = new Scanner(firstLine);
+		int shotNumber = 1;
+
+		while (shots.size() < NUMBER_SHOTS && lineScanner.hasNext()) {
+			String token = lineScanner.next();
 			IPosition pos;
 
 			try {
-				// Constrói a posição
 				if (token.matches("[A-Za-z]")) {
-					if (inputScanner.hasNextInt()) {
-						int row = inputScanner.nextInt();
-						pos = new Position(token.toUpperCase().charAt(0), row);
+					// Formato separado: "A 1"
+					if (lineScanner.hasNextInt()) {
+						pos = new Position(token.toUpperCase().charAt(0), lineScanner.nextInt());
 					} else {
 						turnHistory.append("Tiro ").append(shotNumber)
-								.append(": Posição incompleta! A coluna '").append(token).append("' não é seguida por uma linha.\n");
+								.append(": Posição incompleta! '").append(token).append("'\n");
 						continue;
 					}
 				} else {
-					Scanner singleScanner = new Scanner(token);
-					pos = Tasks.readClassicPosition(singleScanner);
+					// Formato compacto: "A1"
+					Scanner s = new Scanner(token);
+					pos = Tasks.readClassicPosition(s);
 				}
+			} catch (Exception e) {
+				turnHistory.append("Tiro ").append(shotNumber)
+						.append(": Formato inválido -> '").append(token).append("'\n");
+				continue;
+			}
 
-				// Validação da posição
-				if (!pos.isInside()) {
-					turnHistory.append("Tiro ").append(shotNumber)
-							.append(": Jogada inválida! Esta posição está fora da grelha: ").append(pos).append("\n");
-					continue;
-				}
-				if (repeatedShot(pos)) {
-					turnHistory.append("Tiro ").append(shotNumber)
-							.append(": Jogada inválida! Esta posição já foi usada: ").append(pos).append("\n");
-					continue;
-				}
-
-				// Tiro válido
+			if (!pos.isInside()) {
+				turnHistory.append("Tiro ").append(shotNumber)
+						.append(": Fora do tabuleiro -> ").append(pos).append("\n");
+			} else if (repeatedShot(pos)) {
+				turnHistory.append("Tiro ").append(shotNumber)
+						.append(": Repetido -> ").append(pos).append("\n");
+			} else {
 				shots.add(pos);
 				turnHistory.append("Tiro ").append(shotNumber)
 						.append(": VÁLIDO -> ").append(pos).append("\n");
 				shotNumber++;
-
-			} catch (IllegalArgumentException e) {
 			}
 		}
 
-		// Mostrar histórico do turno antes de disparar
-		System.out.println(turnHistory);
+		return finalizeShotsAndFire(shots, turnHistory);
+	}
 
-		// Verifica se temos exatamente NUMBER_SHOTS válidos
-		if (shots.size() != NUMBER_SHOTS) {
-			throw new IllegalArgumentException("Você deve inserir exatamente " + NUMBER_SHOTS + " posições válidas!");
+	// ─────────────────────────────────────────────────────────────────────────────
+// Lógica comum: completar tiros, imprimir histórico, disparar
+// ─────────────────────────────────────────────────────────────────────────────
+	private String finalizeShotsAndFire(List<IPosition> shots, StringBuilder turnHistory) {
+
+		// Completar com repetidos se faltarem (fireShots exige exactamente NUMBER_SHOTS)
+		while (shots.size() < NUMBER_SHOTS) {
+			IPosition filler = shots.isEmpty() ? new Position('A', 1) : shots.get(shots.size() - 1);
+			shots.add(filler);
+			turnHistory.append("(tiro preenchido automaticamente como repetido: ").append(filler).append(")\n");
 		}
+
+		System.out.println(turnHistory);
 
 		this.fireShots(shots);
 		return Game.jsonShots(shots);
