@@ -10,7 +10,7 @@
 https://youtu.be/nd_s4hNQ8LY
 
 
-##Prompt final
+## Prompt final
 Considere que é um estratega especialista no jogo da Batalha Naval
 num tabuleiro 10x10 com linhas A–J e colunas 1–10.
 
