@@ -3,9 +3,9 @@ name: Qodana - Class With Too Many Methods
 
 on:
   push:
-    branches: [main]
+    branches: ["master"]
   pull_request:
-    branches: [main]
+    branches: ["master"]
 
 jobs:
   qodana:
