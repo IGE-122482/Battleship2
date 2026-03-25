@@ -5,7 +5,7 @@ inspections:
   - name: ClassWithTooManyMethods
     enabled: true
     options:
-      methodCountLimit: 10
+      methodCountLimit: 5
       ignoreSimpleGettersAndSetters: true
       ignoreOverridingMethods: false
 
