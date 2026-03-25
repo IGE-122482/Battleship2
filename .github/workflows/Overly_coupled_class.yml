@@ -5,9 +5,9 @@ name: Qodana - Overly Coupled Class
 
 on:
   push:
-    branches: [main]
+    branches: [master]
   pull_request:
-    branches: [main]
+    branches: [master]
 
 jobs:
   qodana:
