@@ -2,9 +2,9 @@ name: SonarCloud Quality Gate Check
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "master" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "master" ]
 
 jobs:
   sonarcloud-quality-gate:
