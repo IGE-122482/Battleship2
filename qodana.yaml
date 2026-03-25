@@ -1,0 +1,10 @@
+version: "1.0"
+linter: jetbrains/qodana-jvm
+
+inspections:
+  - name: ClassWithTooManyMethods
+    enabled: true
+    options:
+      methodCountLimit: 10
+      ignoreSimpleGettersAndSetters: true
+      ignoreOverridingMethods: false
