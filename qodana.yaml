@@ -12,5 +12,5 @@ inspections:
   - name: OverlyCoupledClass
     enabled: true
     options:
-      threshold: 15
+      threshold: 1
 
