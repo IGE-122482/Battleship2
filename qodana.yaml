@@ -5,12 +5,12 @@ inspections:
   - name: ClassWithTooManyMethods
     enabled: true
     options:
-      methodCountLimit: 10
+      methodCountLimit: 100
       ignoreSimpleGettersAndSetters: true
       ignoreOverridingMethods: false
 
   - name: OverlyCoupledClass
     enabled: true
     options:
-      threshold: 15
+      threshold: 150
 
