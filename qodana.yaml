@@ -18,3 +18,10 @@ inspections:
     enabled: true
     options:
       complexityLimit: 80
+
+  - name: ClassWithTooManyFields
+    enabled: true
+    options:
+      fieldCountLimit: 10
+      ignoreStaticFields: false
+      ignoreConstantFields: true
