@@ -17,10 +17,10 @@ jobs:
         with:
           fetch-depth: 0  # Necessário para melhor análise
 
-      - name: Configurar JDK 17
+      - name: Configurar JDK 21
         uses: actions/setup-java@v3
         with:
-          java-version: '17'
+          java-version: '21'
           distribution: 'temurin'
 
       - name: Cache dos pacotes SonarQube
