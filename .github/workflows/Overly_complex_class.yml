@@ -15,7 +15,5 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Run Qodana Community
+      - name: Run Qodana
         uses: JetBrains/qodana-action@v2023.2
-        with:
-          args: --linter jetbrains/qodana-jvm-community --fail-threshold,0
