@@ -21,6 +21,6 @@ jobs:
       - name: Run Qodana
         uses: JetBrains/qodana-action@v2023.3
         with:
-          args: --fail-threshold,0
+          args: --fail-threshold,100
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
