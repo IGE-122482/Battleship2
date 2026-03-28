@@ -1,26 +1,10 @@
+####################################################################################################################
+# WARNING: Do not store sensitive information in this file, as its contents will be included in the Qodana report. #
+####################################################################################################################
+
 version: "1.0"
-
-inspections:
-  - name: ClassWithTooManyMethods
-    enabled: true
-    options:
-      methodCountLimit: 30
-      ignoreSimpleGettersAndSetters: true
-      ignoreOverridingMethods: false
-
-  - name: OverlyCoupledClass
-    enabled: true
-    options:
-      threshold: 40
-
-  - name: OverlyComplexClass
-    enabled: true
-    options:
-      complexityLimit: 80
-
-  - name: ClassWithTooManyFields
-    enabled: true
-    options:
-      fieldCountLimit: 10
-      ignoreStaticFields: false
-      ignoreConstantFields: true
+linter: jetbrains/qodana-jvm:2025.3
+profile:
+  name: qodana.recommended
+include:
+  - name: CheckDependencyLicenses
