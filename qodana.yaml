@@ -14,3 +14,7 @@ inspections:
     options:
       threshold: 40
 
+  - name: OverlyComplexClass
+    enabled: true
+    options:
+      complexityLimit: 80
