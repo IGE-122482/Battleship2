@@ -18,6 +18,6 @@ jobs:
           fetch-depth: 0
 
       - name: Run Qodana
-        uses: JetBrains/qodana-action@v2023.3
+        uses: JetBrains/qodana-action@v2023.1
         with:
           args: --fail-threshold,0
