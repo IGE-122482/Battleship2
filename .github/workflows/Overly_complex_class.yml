@@ -1,0 +1,25 @@
+#Número de aluno: 122482 - Nome: Leonardo Teodoro
+name: Qodana - Overly Complex Class
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  qodana:
+    runs-on: ubuntu-latest
+    steps:
+      
+      name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+      name: Run Qodana
+      uses: JetBrains/qodana-action@v2023.3
+      with:
+        args: --fail-threshold,0
+       env:
+         QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
