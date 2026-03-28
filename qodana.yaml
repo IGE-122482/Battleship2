@@ -4,14 +4,14 @@ inspections:
   - name: ClassWithTooManyMethods
     enabled: true
     options:
-      methodCountLimit: 100
+      methodCountLimit: 1000
       ignoreSimpleGettersAndSetters: true
       ignoreOverridingMethods: false
 
   - name: OverlyCoupledClass
     enabled: true
     options:
-      threshold: 100
+      threshold: 1000
 
   - name: OverlyComplexClass
     enabled: true
@@ -21,6 +21,6 @@ inspections:
   - name: ClassWithTooManyFields
     enabled: true
     options:
-      fieldCountLimit: 100
+      fieldCountLimit: 1000
       ignoreStaticFields: false
       ignoreConstantFields: true
