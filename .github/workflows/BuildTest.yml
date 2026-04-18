@@ -25,6 +25,3 @@ jobs:
 
     - name: Run JUnit tests with Maven
       run: mvn -B test --file pom.xml
-
-    - name: Javadoc with Maven
-      run: mvn -B javadoc:javadoc --file pom.xml
