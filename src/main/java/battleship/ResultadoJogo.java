@@ -11,4 +11,16 @@ public class ResultadoJogo {
         this.acertos = acertos;
         this.naviosAfundados = naviosAfundados;
     }
+
+    public int getTiros() {
+        return tiros;
+    }
+
+    public int getAcertos() {
+        return acertos;
+    }
+
+    public int getNaviosAfundados() {
+        return naviosAfundados;
+    }
 }

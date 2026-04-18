@@ -2,7 +2,6 @@
  * 
  */
 package battleship;
-
 /**
  * The type Main.
  *
@@ -16,12 +15,11 @@ public class Main
 	/**
 	 * Main.
 	 *
-	 * @param args the args
+	 * @param args the argsger
 	 */
 	public static void main(String[] args)
     {
 		System.out.println("***  Battleship  ***");
-
 		Tasks.menu();
     }
 }
