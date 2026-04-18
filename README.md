@@ -5,6 +5,21 @@
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 
+
+## CI/CD com GitHub Actions
+
+Este projeto utiliza GitHub Actions para executar automaticamente:
+- Compilação do projeto
+- Testes unitários JUnit
+- Geração de Javadoc
+
+O workflow é ativado a cada Push para qualquer ramo ou Pull Request para o master.
+
+### Como correr os testes localmente
+mvn test
+
+
+
 > A modern take on the classic naval warfare game, designed for the XVII century setting with updated software engineering patterns.
 
 ## Vídeo de Demonstração:
