@@ -3,24 +3,14 @@ package battleship;
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Test class for Compass.
- * Author: britoeabreu
- * Date: 2023-10-10
- * Time: 15:30
- * Cyclomatic Complexity for each method:
- * - Constructor: 1
- * - getDirection: 1
- * - toString: 1
- * - charToCompass: 4
- */
+@DisplayName("Testes da classe Compass")
 public class CompassTest {
 
 	private Compass compass;
 
 	@BeforeEach
 	void setUp() {
-		compass = Compass.NORTH; // Example instance for testing
+		compass = Compass.NORTH;
 	}
 
 	@AfterEach
@@ -28,64 +18,57 @@ public class CompassTest {
 		compass = null;
 	}
 
-	/**
-	 * Test for the Compass constructor.
-	 * Cyclomatic Complexity: 1
-	 */
 	@Test
+	@DisplayName("Compass não é null")
 	void constructor() {
-		assertNotNull(compass, "Error: Compass instance should not be null.");
+		assertNotNull(compass);
 	}
 
-	/**
-	 * Test for the getDirection method.
-	 * Cyclomatic Complexity: 1
-	 */
 	@Test
+	@DisplayName("getDirection retorna o caractere correto para cada direção")
 	void getDirection() {
-		assertEquals('n', Compass.NORTH.getDirection(), "Error: Direction for NORTH should be 'n'.");
-		assertEquals('s', Compass.SOUTH.getDirection(), "Error: Direction for SOUTH should be 's'.");
-		assertEquals('e', Compass.EAST.getDirection(), "Error: Direction for EAST should be 'e'.");
-		assertEquals('o', Compass.WEST.getDirection(), "Error: Direction for WEST should be 'o'.");
+		assertEquals('n', Compass.NORTH.getDirection());
+		assertEquals('s', Compass.SOUTH.getDirection());
+		assertEquals('e', Compass.EAST.getDirection());
+		assertEquals('o', Compass.WEST.getDirection());
 	}
 
-	/**
-	 * Test for the toString method.
-	 * Cyclomatic Complexity: 1
-	 */
 	@Test
+	@DisplayName("toString retorna o caractere como string")
 	void toStringTest() {
-		assertEquals("n", Compass.NORTH.toString(), "Error: String representation for NORTH should be 'n'.");
-		assertEquals("s", Compass.SOUTH.toString(), "Error: String representation for SOUTH should be 's'.");
-		assertEquals("e", Compass.EAST.toString(), "Error: String representation for EAST should be 'e'.");
-		assertEquals("o", Compass.WEST.toString(), "Error: String representation for WEST should be 'o'.");
+		assertEquals("n", Compass.NORTH.toString());
+		assertEquals("s", Compass.SOUTH.toString());
+		assertEquals("e", Compass.EAST.toString());
+		assertEquals("o", Compass.WEST.toString());
 	}
 
-	/**
-	 * Test for the charToCompass method (all conditions true).
-	 * Cyclomatic Complexity: 4
-	 */
 	@Test
+	@DisplayName("charToCompass converte cada caractere válido corretamente")
 	void charToCompass1() {
-		assertEquals(Compass.NORTH, Compass.charToCompass('n'), "Error: 'n' should map to Compass.NORTH.");
-		assertEquals(Compass.SOUTH, Compass.charToCompass('s'), "Error: 's' should map to Compass.SOUTH.");
-		assertEquals(Compass.EAST, Compass.charToCompass('e'), "Error: 'e' should map to Compass.EAST.");
-		assertEquals(Compass.WEST, Compass.charToCompass('o'), "Error: 'o' should map to Compass.WEST.");
+		assertEquals(Compass.NORTH, Compass.charToCompass('n'));
+		assertEquals(Compass.SOUTH, Compass.charToCompass('s'));
+		assertEquals(Compass.EAST, Compass.charToCompass('e'));
+		assertEquals(Compass.WEST, Compass.charToCompass('o'));
 	}
 
-	/**
-	 * Test for the charToCompass method (invalid input).
-	 */
 	@Test
+	@DisplayName("charToCompass com caractere inválido retorna null")
 	void charToCompass2() {
-		assertNull(Compass.charToCompass('x'), "Error: 'x' should map to null.");
+		assertNull(Compass.charToCompass('x'));
 	}
 
-	/**
-	 * Test for the charToCompass method (null input).
-	 */
 	@Test
+	@DisplayName("charToCompass com caractere nulo retorna null")
 	void charToCompass3() {
-		assertNull(Compass.charToCompass('\0'), "Error: Null character should map to null.");
+		assertNull(Compass.charToCompass('\0'));
+	}
+
+	@Test
+	@DisplayName("randomBearing retorna uma direção válida")
+	void testRandomBearing() {
+		Compass bearing = Compass.randomBearing();
+		assertNotNull(bearing);
+		assertTrue(bearing == Compass.NORTH || bearing == Compass.SOUTH ||
+				bearing == Compass.EAST || bearing == Compass.WEST);
 	}
 }
