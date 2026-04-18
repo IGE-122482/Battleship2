@@ -82,7 +82,7 @@ class ShipTest {
     }
 
     @Test
-    @DisplayName("Posição mais à esquerda está correta")
+    @DisplayName("Posição mais à esquerda está correta!")
     void testGetLeftMostPos() {
         assertEquals(3, ship.getLeftMostPos());
     }
