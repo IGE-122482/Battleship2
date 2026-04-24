@@ -31,33 +31,23 @@ public class Game implements IGame
 		assert fleet != null;
 		assert moves != null;
 
-		char[][] map = new char[BOARD_SIZE][BOARD_SIZE];
+		char[][] map = getChars(fleet, moves, show_shots);
 
-		for (int r = 0; r < BOARD_SIZE; r++)
-			for (int c = 0; c < BOARD_SIZE; c++)
-				map[r][c] = EMPTY_MARKER;
+		extracted(map);
 
-		for (IShip ship : fleet.getShips()) {
-			for (IPosition ship_pos : ship.getPositions())
-				map[ship_pos.getRow()][ship_pos.getColumn()] = SHIP_MARKER;
-			if (!ship.stillFloating())
-				for (IPosition adjacent_pos : ship.getAdjacentPositions())
-					map[adjacent_pos.getRow()][adjacent_pos.getColumn()] = SHIP_ADJACENT_MARKER;
+		printLegend(showLegend);
+		System.out.println();
+	}
+
+	private static void printLegend(boolean showLegend) {
+		if (showLegend) {
+			System.out.println("          LEGENDA");
+			System.out.println("'" + SHIP_MARKER + "'->navio, '" + SHIP_ADJACENT_MARKER + "'->adjacente a navio, '" + EMPTY_MARKER + "'->água");
+			System.out.println("'" + SHOT_SHIP_MARKER + "'->Tiro certeiro, '" + SHOT_WATER_MARKER + "'->Tiro na água");
 		}
+	}
 
-		if (show_shots)
-			for (IMove move : moves)
-				for (IPosition shot : move.getShots()) {
-					if (shot.isInside()){
-						int row = shot.getRow();
-						int col = shot.getColumn();
-						if (map[row][col] == SHIP_MARKER)
-							map[row][col] = SHOT_SHIP_MARKER;
-						if (map[row][col] == EMPTY_MARKER || map[row][col] == SHIP_ADJACENT_MARKER)
-							map[row][col] = SHOT_WATER_MARKER;
-					}
-				}
-
+	private static void extracted(char[][] map) {
 		System.out.println();
 		System.out.print("    ");
 		for (int col = 0; col < BOARD_SIZE; col++) {
@@ -84,14 +74,38 @@ public class Game implements IGame
 		for (int col = 0; col < BOARD_SIZE; col++)
 			System.out.print("--");
 		System.out.println("-+");
-
-		if (showLegend) {
-			System.out.println("          LEGENDA");
-			System.out.println("'" + SHIP_MARKER + "'->navio, '" + SHIP_ADJACENT_MARKER + "'->adjacente a navio, '" + EMPTY_MARKER + "'->água");
-			System.out.println("'" + SHOT_SHIP_MARKER + "'->Tiro certeiro, '" + SHOT_WATER_MARKER + "'->Tiro na água");
-		}
-		System.out.println();
 	}
+
+	private static char[][] getChars(IFleet fleet, List<IMove> moves, boolean show_shots) {
+		char[][] map = new char[BOARD_SIZE][BOARD_SIZE];
+
+		for (int r = 0; r < BOARD_SIZE; r++)
+			for (int c = 0; c < BOARD_SIZE; c++)
+				map[r][c] = EMPTY_MARKER;
+
+		for (IShip ship : fleet.getShips()) {
+			for (IPosition ship_pos : ship.getPositions())
+				map[ship_pos.getRow()][ship_pos.getColumn()] = SHIP_MARKER;
+			if (!ship.stillFloating())
+				for (IPosition adjacent_pos : ship.getAdjacentPositions())
+					map[adjacent_pos.getRow()][adjacent_pos.getColumn()] = SHIP_ADJACENT_MARKER;
+		}
+
+		if (show_shots)
+			for (IMove move : moves)
+				for (IPosition shot : move.getShots()) {
+					if (shot.isInside()){
+						int row = shot.getRow();
+						int col = shot.getColumn();
+						if (map[row][col] == SHIP_MARKER)
+							map[row][col] = SHOT_SHIP_MARKER;
+						if (map[row][col] == EMPTY_MARKER || map[row][col] == SHIP_ADJACENT_MARKER)
+							map[row][col] = SHOT_WATER_MARKER;
+					}
+				}
+		return map;
+	}
+	
 
 	public void printStatistics() {
 
@@ -146,14 +160,7 @@ public class Game implements IGame
 		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 
 		// 1. Create a simplified list containing only the desired data
-		List<Map<String, Object>> simplifiedShots = new ArrayList<>();
-		for (IPosition shot : shots) {
-			Map<String, Object> simplePos = new LinkedHashMap<>();
-			// We use getClassicRow() and getClassicColumn() based on your current JSON output
-			simplePos.put("row", String.valueOf(shot.getClassicRow()));
-			simplePos.put("column", shot.getClassicColumn());
-			simplifiedShots.add(simplePos);
-		}
+		List<Map<String, Object>> simplifiedShots = buildSimplifiedShots(shots);
 
 		String jsonString = null;
 		try {
@@ -168,6 +175,18 @@ public class Game implements IGame
 
 		// Retornar o JSON
 		return jsonString;
+	}
+
+	private static List<Map<String, Object>> buildSimplifiedShots(List<IPosition> shots) {
+		List<Map<String, Object>> simplifiedShots = new ArrayList<>();
+		for (IPosition shot : shots) {
+			Map<String, Object> simplePos = new LinkedHashMap<>();
+			// We use getClassicRow() and getClassicColumn() based on your current JSON output
+			simplePos.put("row", String.valueOf(shot.getClassicRow()));
+			simplePos.put("column", shot.getClassicColumn());
+			simplifiedShots.add(simplePos);
+		}
+		return simplifiedShots;
 	}
 
 	//------------------------------------------------------------------
