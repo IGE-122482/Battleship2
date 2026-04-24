@@ -33,6 +33,17 @@ public class Game implements IGame
 
 		char[][] map = getChars(fleet, moves, show_shots);
 
+		extracted(map);
+
+		if (showLegend) {
+			System.out.println("          LEGENDA");
+			System.out.println("'" + SHIP_MARKER + "'->navio, '" + SHIP_ADJACENT_MARKER + "'->adjacente a navio, '" + EMPTY_MARKER + "'->água");
+			System.out.println("'" + SHOT_SHIP_MARKER + "'->Tiro certeiro, '" + SHOT_WATER_MARKER + "'->Tiro na água");
+		}
+		System.out.println();
+	}
+
+	private static void extracted(char[][] map) {
 		System.out.println();
 		System.out.print("    ");
 		for (int col = 0; col < BOARD_SIZE; col++) {
@@ -59,13 +70,6 @@ public class Game implements IGame
 		for (int col = 0; col < BOARD_SIZE; col++)
 			System.out.print("--");
 		System.out.println("-+");
-
-		if (showLegend) {
-			System.out.println("          LEGENDA");
-			System.out.println("'" + SHIP_MARKER + "'->navio, '" + SHIP_ADJACENT_MARKER + "'->adjacente a navio, '" + EMPTY_MARKER + "'->água");
-			System.out.println("'" + SHOT_SHIP_MARKER + "'->Tiro certeiro, '" + SHOT_WATER_MARKER + "'->Tiro na água");
-		}
-		System.out.println();
 	}
 
 	private static char[][] getChars(IFleet fleet, List<IMove> moves, boolean show_shots) {
@@ -97,6 +101,7 @@ public class Game implements IGame
 				}
 		return map;
 	}
+
 
 	public void printStatistics() {
 
