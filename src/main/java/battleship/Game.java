@@ -443,21 +443,26 @@ public class Game implements IGame
 				continue;
 			}
 
-			if (!pos.isInside()) {
-				turnHistory.append("Tiro ").append(shotNumber)
-						.append(": Fora do tabuleiro -> ").append(pos).append("\n");
-			} else if (repeatedShot(pos)) {
-				turnHistory.append("Tiro ").append(shotNumber)
-						.append(": Repetido -> ").append(pos).append("\n");
-			} else {
-				shots.add(pos);
-				turnHistory.append("Tiro ").append(shotNumber)
-						.append(": VÁLIDO -> ").append(pos).append("\n");
-				shotNumber++;
-			}
+			shotNumber = ValidateAndAddShot(pos, turnHistory, shotNumber, shots);
 		}
 
 		return finalizeShotsAndFire(shots, turnHistory);
+	}
+
+	private int ValidateAndAddShot(IPosition pos, StringBuilder turnHistory, int shotNumber, List<IPosition> shots) {
+		if (!pos.isInside()) {
+			turnHistory.append("Tiro ").append(shotNumber)
+					.append(": Fora do tabuleiro -> ").append(pos).append("\n");
+		} else if (repeatedShot(pos)) {
+			turnHistory.append("Tiro ").append(shotNumber)
+					.append(": Repetido -> ").append(pos).append("\n");
+		} else {
+			shots.add(pos);
+			turnHistory.append("Tiro ").append(shotNumber)
+					.append(": VÁLIDO -> ").append(pos).append("\n");
+			shotNumber++;
+		}
+		return shotNumber;
 	}
 
 	private IPosition parsePosition(String token, Scanner lineScanner,
