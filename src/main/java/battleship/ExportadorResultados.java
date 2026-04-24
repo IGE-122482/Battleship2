@@ -7,12 +7,14 @@ public class ExportadorResultados {
 
     public static void guardarResultado(ResultadoJogo resultado) {
         ObjectMapper mapper = new ObjectMapper();
-
         try {
             mapper.writeValue(new File("resultado.json"), resultado);
             System.out.println("Resultado guardado em resultado.json");
         } catch (Exception e) {
-            e.printStackTrace();
+            handleExportError(e);
         }
+    }private static void handleExportError(Exception e) {
+        System.err.println("Erro ao guardar resultado: " + e.getMessage());
+        e.printStackTrace();
     }
 }
