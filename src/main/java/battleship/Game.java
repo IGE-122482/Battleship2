@@ -512,6 +512,10 @@ public class Game implements IGame
 			alreadyShot.add(pos);
 		}
 
+		extracted(shots, shotResults);
+	}
+
+	private void extracted(List<IPosition> shots, List<ShotResult> shotResults) {
 		Move move = new Move(moveNumber, shots, shotResults);
 
 //		System.out.println(move);
@@ -522,6 +526,7 @@ public class Game implements IGame
 
 		moveNumber++;
 	}
+
 	// Chamar no fim da jogada para calcular o tempo
 	public void endMoveTimer() {
 		if (startMoveTime != null) {
