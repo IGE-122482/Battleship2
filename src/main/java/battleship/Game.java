@@ -273,6 +273,19 @@ public class Game implements IGame
 		System.out.println();
 		// Gerar coordenadas únicas até atingir o número definido por NUMBER_SHOTS
 
+		SelectShots(candidateShots, shots, random);
+
+		System.out.print("rajada ");
+		for (IPosition shot : shots)
+			System.out.print(shot + " ");
+		System.out.println();
+
+		this.fireShots(shots);
+
+		return Game.jsonShots(shots);
+	}
+
+	private static void SelectShots(List<IPosition> candidateShots, List<IPosition> shots, Random random) {
 		IPosition newShot = null;
 		if (candidateShots.size() >= Game.NUMBER_SHOTS)
 			while (shots.size() < Game.NUMBER_SHOTS) {
@@ -289,15 +302,6 @@ public class Game implements IGame
 			while (shots.size() < Game.NUMBER_SHOTS)
 				shots.add(newShot);
 		}
-
-		System.out.print("rajada ");
-		for (IPosition shot : shots)
-			System.out.print(shot + " ");
-		System.out.println();
-
-		this.fireShots(shots);
-
-		return Game.jsonShots(shots);
 	}
 
 	private List<IPosition> getCandidateShots() {
