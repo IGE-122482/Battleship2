@@ -19,5 +19,5 @@
 | Game::fireShots | Long Method | Extract Method (extrair criação e registo do Move) | 122482 |
 | Fleet::colisionRisk | Long Method | Replace Loop with Stream (substituir for por stream com anyMatch) | 122482 |
 | ExportadorResultados::guardarResultado | Long Method | Extract Method (extrair tratamento do catch) | 122482 |
-| Carrack | Duplicated Code | Rename (renomear variáveis de loop para maior clareza) | 122482 |
+| Frigate | Duplicated Code | Extract Method (unificar cases NORTH/SOUTH e EAST/WEST no switch) | 122482 |
 | Game | Long Method | Rename (renomear countInvalidShots, countRepeatedShots para nomes mais expressivos) | 122482 |
