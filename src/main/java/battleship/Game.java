@@ -284,15 +284,7 @@ public class Game implements IGame
 		// Criar uma instância de Random com uma seed baseada no timestamp atual
 		Random random = new Random(System.currentTimeMillis());
 
-		Set<IPosition> usablePositions = new HashSet<IPosition>();
-		for (int r = 0; r < BOARD_SIZE; r++)
-			for (int c = 0; c < BOARD_SIZE; c++)
-				usablePositions.add(new Position(r, c));
-
-		this.myFleet.getSunkShips().forEach(ship -> usablePositions.removeAll(ship.getAdjacentPositions()));
-		this.alienMoves.forEach(move ->  usablePositions.removeAll(move.getShots()));
-
-		List<IPosition> candidateShots = new ArrayList<>(usablePositions);
+		List<IPosition> candidateShots = getCandidateShots();
 
 		// Criar lista para armazenar os tiros
 		List<IPosition> shots = new ArrayList<IPosition>();
@@ -300,6 +292,19 @@ public class Game implements IGame
 		System.out.println();
 		// Gerar coordenadas únicas até atingir o número definido por NUMBER_SHOTS
 
+		SelectShots(candidateShots, shots, random);
+
+		System.out.print("rajada ");
+		for (IPosition shot : shots)
+			System.out.print(shot + " ");
+		System.out.println();
+
+		this.fireShots(shots);
+
+		return Game.jsonShots(shots);
+	}
+
+	private static void SelectShots(List<IPosition> candidateShots, List<IPosition> shots, Random random) {
 		IPosition newShot = null;
 		if (candidateShots.size() >= Game.NUMBER_SHOTS)
 			while (shots.size() < Game.NUMBER_SHOTS) {
@@ -316,15 +321,19 @@ public class Game implements IGame
 			while (shots.size() < Game.NUMBER_SHOTS)
 				shots.add(newShot);
 		}
+	}
 
-		System.out.print("rajada ");
-		for (IPosition shot : shots)
-			System.out.print(shot + " ");
-		System.out.println();
+	private List<IPosition> getCandidateShots() {
+		Set<IPosition> usablePositions = new HashSet<IPosition>();
+		for (int r = 0; r < BOARD_SIZE; r++)
+			for (int c = 0; c < BOARD_SIZE; c++)
+				usablePositions.add(new Position(r, c));
 
-		this.fireShots(shots);
+		this.myFleet.getSunkShips().forEach(ship -> usablePositions.removeAll(ship.getAdjacentPositions()));
+		this.alienMoves.forEach(move ->  usablePositions.removeAll(move.getShots()));
 
-		return Game.jsonShots(shots);
+		List<IPosition> candidateShots = new ArrayList<>(usablePositions);
+		return candidateShots;
 	}
 
 
@@ -445,41 +454,50 @@ public class Game implements IGame
 			IPosition pos;
 
 			try {
-				if (token.matches("[A-Za-z]")) {
-					// Formato separado: "A 1"
-					if (lineScanner.hasNextInt()) {
-						pos = new Position(token.toUpperCase().charAt(0), lineScanner.nextInt());
-					} else {
-						turnHistory.append("Tiro ").append(shotNumber)
-								.append(": Posição incompleta! '").append(token).append("'\n");
-						continue;
-					}
-				} else {
-					// Formato compacto: "A1"
-					Scanner s = new Scanner(token);
-					pos = Tasks.readClassicPosition(s);
-				}
+				pos = parsePosition(token, lineScanner, shotNumber, turnHistory);
+				if (pos == null) continue;
 			} catch (Exception e) {
 				turnHistory.append("Tiro ").append(shotNumber)
 						.append(": Formato inválido -> '").append(token).append("'\n");
 				continue;
 			}
 
-			if (!pos.isInside()) {
-				turnHistory.append("Tiro ").append(shotNumber)
-						.append(": Fora do tabuleiro -> ").append(pos).append("\n");
-			} else if (repeatedShot(pos)) {
-				turnHistory.append("Tiro ").append(shotNumber)
-						.append(": Repetido -> ").append(pos).append("\n");
-			} else {
-				shots.add(pos);
-				turnHistory.append("Tiro ").append(shotNumber)
-						.append(": VÁLIDO -> ").append(pos).append("\n");
-				shotNumber++;
-			}
+			shotNumber = ValidateAndAddShot(pos, turnHistory, shotNumber, shots);
 		}
 
 		return finalizeShotsAndFire(shots, turnHistory);
+	}
+
+	private int ValidateAndAddShot(IPosition pos, StringBuilder turnHistory, int shotNumber, List<IPosition> shots) {
+		if (!pos.isInside()) {
+			turnHistory.append("Tiro ").append(shotNumber)
+					.append(": Fora do tabuleiro -> ").append(pos).append("\n");
+		} else if (repeatedShot(pos)) {
+			turnHistory.append("Tiro ").append(shotNumber)
+					.append(": Repetido -> ").append(pos).append("\n");
+		} else {
+			shots.add(pos);
+			turnHistory.append("Tiro ").append(shotNumber)
+					.append(": VÁLIDO -> ").append(pos).append("\n");
+			shotNumber++;
+		}
+		return shotNumber;
+	}
+
+	private IPosition parsePosition(String token, Scanner lineScanner,
+									int shotNumber, StringBuilder turnHistory) {
+		if (token.matches("[A-Za-z]")) {
+			if (lineScanner.hasNextInt()) {
+				return new Position(token.toUpperCase().charAt(0), lineScanner.nextInt());
+			} else {
+				turnHistory.append("Tiro ").append(shotNumber)
+						.append(": Posição incompleta! '").append(token).append("'\n");
+				return null;
+			}
+		} else {
+			Scanner s = new Scanner(token);
+			return Tasks.readClassicPosition(s);
+		}
 	}
 
 	// ─────────────────────────────────────────────────────────────────────────────
