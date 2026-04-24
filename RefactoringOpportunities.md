@@ -8,8 +8,8 @@
 | ResultadoJogo | Data Class | Encapsulate Fields (tornar campos privados) | 122478 |
 | Game::randomEnemyFire | Long Method | Extract Method (extrair geração de posições candidatas) | 122457 |
 | Game::randomEnemyFire | Long Method | Extract Method (extrair lógica de seleção dos tiros) | 122457 |
-| Game::readEnemyFire | Long Method | Extract Method (extrair parsing de uma posição do scanner) | 122457 |
-| Game::readEnemyFire | Long Method | Extract Method (extrair validação de posição) | 122457 |
+| Game::readEnemyFireFromText | Long Method | Extract Method (extrair parsing de uma posição do scanner) | 122457 |
+| Game::readEnemyFireFromText | Long Method | Extract Method (extrair validação de posição) | 122457 |
 | Carrack | Duplicated Code | Extract Method (unificar cases NORTH/SOUTH e EAST/WEST no switch) | 122457 |
 | Move::processEnemyFire | Long Method | Extract Method (extrair construção da mensagem verbose) | 122488 |
 | Move::processEnemyFire | Long Method | Extract Method (extrair contagem dos resultados dos tiros) | 122488 |
