@@ -160,14 +160,7 @@ public class Game implements IGame
 		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 
 		// 1. Create a simplified list containing only the desired data
-		List<Map<String, Object>> simplifiedShots = new ArrayList<>();
-		for (IPosition shot : shots) {
-			Map<String, Object> simplePos = new LinkedHashMap<>();
-			// We use getClassicRow() and getClassicColumn() based on your current JSON output
-			simplePos.put("row", String.valueOf(shot.getClassicRow()));
-			simplePos.put("column", shot.getClassicColumn());
-			simplifiedShots.add(simplePos);
-		}
+		List<Map<String, Object>> simplifiedShots = buildSimplifiedShots(shots);
 
 		String jsonString = null;
 		try {
@@ -182,6 +175,18 @@ public class Game implements IGame
 
 		// Retornar o JSON
 		return jsonString;
+	}
+
+	private static List<Map<String, Object>> buildSimplifiedShots(List<IPosition> shots) {
+		List<Map<String, Object>> simplifiedShots = new ArrayList<>();
+		for (IPosition shot : shots) {
+			Map<String, Object> simplePos = new LinkedHashMap<>();
+			// We use getClassicRow() and getClassicColumn() based on your current JSON output
+			simplePos.put("row", String.valueOf(shot.getClassicRow()));
+			simplePos.put("column", shot.getClassicColumn());
+			simplifiedShots.add(simplePos);
+		}
+		return simplifiedShots;
 	}
 
 	//------------------------------------------------------------------
