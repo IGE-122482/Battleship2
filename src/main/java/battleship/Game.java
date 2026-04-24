@@ -435,20 +435,8 @@ public class Game implements IGame
 			IPosition pos;
 
 			try {
-				if (token.matches("[A-Za-z]")) {
-					// Formato separado: "A 1"
-					if (lineScanner.hasNextInt()) {
-						pos = new Position(token.toUpperCase().charAt(0), lineScanner.nextInt());
-					} else {
-						turnHistory.append("Tiro ").append(shotNumber)
-								.append(": Posição incompleta! '").append(token).append("'\n");
-						continue;
-					}
-				} else {
-					// Formato compacto: "A1"
-					Scanner s = new Scanner(token);
-					pos = Tasks.readClassicPosition(s);
-				}
+				pos = parsePosition(token, lineScanner, shotNumber, turnHistory);
+				if (pos == null) continue;
 			} catch (Exception e) {
 				turnHistory.append("Tiro ").append(shotNumber)
 						.append(": Formato inválido -> '").append(token).append("'\n");
@@ -470,6 +458,22 @@ public class Game implements IGame
 		}
 
 		return finalizeShotsAndFire(shots, turnHistory);
+	}
+
+	private IPosition parsePosition(String token, Scanner lineScanner,
+									int shotNumber, StringBuilder turnHistory) {
+		if (token.matches("[A-Za-z]")) {
+			if (lineScanner.hasNextInt()) {
+				return new Position(token.toUpperCase().charAt(0), lineScanner.nextInt());
+			} else {
+				turnHistory.append("Tiro ").append(shotNumber)
+						.append(": Posição incompleta! '").append(token).append("'\n");
+				return null;
+			}
+		} else {
+			Scanner s = new Scanner(token);
+			return Tasks.readClassicPosition(s);
+		}
 	}
 
 	// ─────────────────────────────────────────────────────────────────────────────
