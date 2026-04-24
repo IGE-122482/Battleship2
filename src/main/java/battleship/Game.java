@@ -512,10 +512,10 @@ public class Game implements IGame
 			alreadyShot.add(pos);
 		}
 
-		extracted(shots, shotResults);
+		registerMove(shots, shotResults);
 	}
 
-	private void extracted(List<IPosition> shots, List<ShotResult> shotResults) {
+	private void registerMove(List<IPosition> shots, List<ShotResult> shotResults) {
 		Move move = new Move(moveNumber, shots, shotResults);
 
 //		System.out.println(move);
