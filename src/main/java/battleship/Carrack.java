@@ -23,21 +23,22 @@ public class Carrack extends Ship {
 
 		switch (bearing) {
 			case SOUTH:
-				for (int rowOffset = 0; rowOffset < this.getSize(); rowOffset++)
-					getPositions().add(new Position(pos.getRow() + rowOffset, pos.getColumn()));
-				break;
 			case NORTH:
-				for (int rowOffset = 0; rowOffset < this.getSize(); rowOffset++)
-					getPositions().add(new Position(pos.getRow() + rowOffset, pos.getColumn()));
+				addVerticalPositions(pos);
 				break;
 			case EAST:
-				for (int colOffsset = 0; colOffsset < this.getSize(); colOffsset++)
-					getPositions().add(new Position(pos.getRow(), pos.getColumn() + colOffsset));
-				break;
 			case WEST:
-				for (int colOffset = 0; colOffset < this.getSize(); colOffset++)
-					getPositions().add(new Position(pos.getRow(), pos.getColumn() + colOffset));
+				addHorizontalPositions(pos);
 				break;
 		}
+	}
+	private void addVerticalPositions(IPosition pos) {
+		for (int r = 0; r < this.getSize(); r++)
+			getPositions().add(new Position(pos.getRow() + r, pos.getColumn()));
+	}
+
+	private void addHorizontalPositions(IPosition pos) {
+		for (int c = 0; c < this.getSize(); c++)
+			getPositions().add(new Position(pos.getRow(), pos.getColumn() + c));
 	}
 }
