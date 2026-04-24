@@ -187,8 +187,8 @@ public class Game implements IGame
 	private final IFleet alienFleet;
 	private final List<IMove> myMoves;
 
-	private Integer countInvalidShots;
-	private Integer countRepeatedShots;
+	private Integer invalidShotCount;
+	private Integer repeatedShotCount;
 	private Integer countHits;
 	private Integer countSinks;
 	private int moveNumber;
@@ -207,8 +207,8 @@ public class Game implements IGame
 		this.alienFleet = new Fleet();
 		this.myFleet = myFleet;
 
-		this.countInvalidShots = 0;
-		this.countRepeatedShots = 0;
+		this.invalidShotCount = 0;
+		this.repeatedShotCount = 0;
 		this.countHits = 0;
 		this.countSinks = 0;
 		this.moveDurations = new ArrayList<>();
@@ -554,12 +554,12 @@ public class Game implements IGame
 		assert pos != null;
 
 		if (!pos.isInside()) {
-			countInvalidShots++;
+			invalidShotCount++;
 			return new ShotResult(false, false, null, false);
 		}
 
 		if (isRepeated || repeatedShot(pos)) {
-			countRepeatedShots++;
+			repeatedShotCount++;
 			return new ShotResult(true, true, null, false);
 		}
 
@@ -580,13 +580,13 @@ public class Game implements IGame
 	@Override
 	public int getRepeatedShots()
 	{
-		return this.countRepeatedShots;
+		return this.repeatedShotCount;
 	}
 
 	@Override
 	public int getInvalidShots()
 	{
-		return this.countInvalidShots;
+		return this.invalidShotCount;
 	}
 
 	@Override
