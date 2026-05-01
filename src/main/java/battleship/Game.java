@@ -31,33 +31,23 @@ public class Game implements IGame
 		assert fleet != null;
 		assert moves != null;
 
-		char[][] map = new char[BOARD_SIZE][BOARD_SIZE];
+		char[][] map = getChars(fleet, moves, show_shots);
 
-		for (int r = 0; r < BOARD_SIZE; r++)
-			for (int c = 0; c < BOARD_SIZE; c++)
-				map[r][c] = EMPTY_MARKER;
+		extracted(map);
 
-		for (IShip ship : fleet.getShips()) {
-			for (IPosition ship_pos : ship.getPositions())
-				map[ship_pos.getRow()][ship_pos.getColumn()] = SHIP_MARKER;
-			if (!ship.stillFloating())
-				for (IPosition adjacent_pos : ship.getAdjacentPositions())
-					map[adjacent_pos.getRow()][adjacent_pos.getColumn()] = SHIP_ADJACENT_MARKER;
+		printLegend(showLegend);
+		System.out.println();
+	}
+
+	private static void printLegend(boolean showLegend) {
+		if (showLegend) {
+			System.out.println("          LEGENDA");
+			System.out.println("'" + SHIP_MARKER + "'->navio, '" + SHIP_ADJACENT_MARKER + "'->adjacente a navio, '" + EMPTY_MARKER + "'->água");
+			System.out.println("'" + SHOT_SHIP_MARKER + "'->Tiro certeiro, '" + SHOT_WATER_MARKER + "'->Tiro na água");
 		}
+	}
 
-		if (show_shots)
-			for (IMove move : moves)
-				for (IPosition shot : move.getShots()) {
-					if (shot.isInside()){
-						int row = shot.getRow();
-						int col = shot.getColumn();
-						if (map[row][col] == SHIP_MARKER)
-							map[row][col] = SHOT_SHIP_MARKER;
-						if (map[row][col] == EMPTY_MARKER || map[row][col] == SHIP_ADJACENT_MARKER)
-							map[row][col] = SHOT_WATER_MARKER;
-					}
-				}
-
+	private static void extracted(char[][] map) {
 		System.out.println();
 		System.out.print("    ");
 		for (int col = 0; col < BOARD_SIZE; col++) {
@@ -84,14 +74,38 @@ public class Game implements IGame
 		for (int col = 0; col < BOARD_SIZE; col++)
 			System.out.print("--");
 		System.out.println("-+");
-
-		if (showLegend) {
-			System.out.println("          LEGENDA");
-			System.out.println("'" + SHIP_MARKER + "'->navio, '" + SHIP_ADJACENT_MARKER + "'->adjacente a navio, '" + EMPTY_MARKER + "'->água");
-			System.out.println("'" + SHOT_SHIP_MARKER + "'->Tiro certeiro, '" + SHOT_WATER_MARKER + "'->Tiro na água");
-		}
-		System.out.println();
 	}
+
+	private static char[][] getChars(IFleet fleet, List<IMove> moves, boolean show_shots) {
+		char[][] map = new char[BOARD_SIZE][BOARD_SIZE];
+
+		for (int r = 0; r < BOARD_SIZE; r++)
+			for (int c = 0; c < BOARD_SIZE; c++)
+				map[r][c] = EMPTY_MARKER;
+
+		for (IShip ship : fleet.getShips()) {
+			for (IPosition ship_pos : ship.getPositions())
+				map[ship_pos.getRow()][ship_pos.getColumn()] = SHIP_MARKER;
+			if (!ship.stillFloating())
+				for (IPosition adjacent_pos : ship.getAdjacentPositions())
+					map[adjacent_pos.getRow()][adjacent_pos.getColumn()] = SHIP_ADJACENT_MARKER;
+		}
+
+		if (show_shots)
+			for (IMove move : moves)
+				for (IPosition shot : move.getShots()) {
+					if (shot.isInside()){
+						int row = shot.getRow();
+						int col = shot.getColumn();
+						if (map[row][col] == SHIP_MARKER)
+							map[row][col] = SHOT_SHIP_MARKER;
+						if (map[row][col] == EMPTY_MARKER || map[row][col] == SHIP_ADJACENT_MARKER)
+							map[row][col] = SHOT_WATER_MARKER;
+					}
+				}
+		return map;
+	}
+	
 
 	public void printStatistics() {
 
@@ -146,14 +160,7 @@ public class Game implements IGame
 		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 
 		// 1. Create a simplified list containing only the desired data
-		List<Map<String, Object>> simplifiedShots = new ArrayList<>();
-		for (IPosition shot : shots) {
-			Map<String, Object> simplePos = new LinkedHashMap<>();
-			// We use getClassicRow() and getClassicColumn() based on your current JSON output
-			simplePos.put("row", String.valueOf(shot.getClassicRow()));
-			simplePos.put("column", shot.getClassicColumn());
-			simplifiedShots.add(simplePos);
-		}
+		List<Map<String, Object>> simplifiedShots = buildSimplifiedShots(shots);
 
 		String jsonString = null;
 		try {
@@ -168,6 +175,18 @@ public class Game implements IGame
 
 		// Retornar o JSON
 		return jsonString;
+	}
+
+	private static List<Map<String, Object>> buildSimplifiedShots(List<IPosition> shots) {
+		List<Map<String, Object>> simplifiedShots = new ArrayList<>();
+		for (IPosition shot : shots) {
+			Map<String, Object> simplePos = new LinkedHashMap<>();
+			// We use getClassicRow() and getClassicColumn() based on your current JSON output
+			simplePos.put("row", String.valueOf(shot.getClassicRow()));
+			simplePos.put("column", shot.getClassicColumn());
+			simplifiedShots.add(simplePos);
+		}
+		return simplifiedShots;
 	}
 
 	//------------------------------------------------------------------
@@ -187,8 +206,8 @@ public class Game implements IGame
 	private final IFleet alienFleet;
 	private final List<IMove> myMoves;
 
-	private Integer countInvalidShots;
-	private Integer countRepeatedShots;
+	private Integer invalidShotCount;
+	private Integer repeatedShotCount;
 	private Integer countHits;
 	private Integer countSinks;
 	private int moveNumber;
@@ -207,8 +226,8 @@ public class Game implements IGame
 		this.alienFleet = new Fleet();
 		this.myFleet = myFleet;
 
-		this.countInvalidShots = 0;
-		this.countRepeatedShots = 0;
+		this.invalidShotCount = 0;
+		this.repeatedShotCount = 0;
 		this.countHits = 0;
 		this.countSinks = 0;
 		this.moveDurations = new ArrayList<>();
@@ -265,15 +284,7 @@ public class Game implements IGame
 		// Criar uma instância de Random com uma seed baseada no timestamp atual
 		Random random = new Random(System.currentTimeMillis());
 
-		Set<IPosition> usablePositions = new HashSet<IPosition>();
-		for (int r = 0; r < BOARD_SIZE; r++)
-			for (int c = 0; c < BOARD_SIZE; c++)
-				usablePositions.add(new Position(r, c));
-
-		this.myFleet.getSunkShips().forEach(ship -> usablePositions.removeAll(ship.getAdjacentPositions()));
-		this.alienMoves.forEach(move ->  usablePositions.removeAll(move.getShots()));
-
-		List<IPosition> candidateShots = new ArrayList<>(usablePositions);
+		List<IPosition> candidateShots = getCandidateShots();
 
 		// Criar lista para armazenar os tiros
 		List<IPosition> shots = new ArrayList<IPosition>();
@@ -281,6 +292,19 @@ public class Game implements IGame
 		System.out.println();
 		// Gerar coordenadas únicas até atingir o número definido por NUMBER_SHOTS
 
+		SelectShots(candidateShots, shots, random);
+
+		System.out.print("rajada ");
+		for (IPosition shot : shots)
+			System.out.print(shot + " ");
+		System.out.println();
+
+		this.fireShots(shots);
+
+		return Game.jsonShots(shots);
+	}
+
+	private static void SelectShots(List<IPosition> candidateShots, List<IPosition> shots, Random random) {
 		IPosition newShot = null;
 		if (candidateShots.size() >= Game.NUMBER_SHOTS)
 			while (shots.size() < Game.NUMBER_SHOTS) {
@@ -297,15 +321,19 @@ public class Game implements IGame
 			while (shots.size() < Game.NUMBER_SHOTS)
 				shots.add(newShot);
 		}
+	}
 
-		System.out.print("rajada ");
-		for (IPosition shot : shots)
-			System.out.print(shot + " ");
-		System.out.println();
+	private List<IPosition> getCandidateShots() {
+		Set<IPosition> usablePositions = new HashSet<IPosition>();
+		for (int r = 0; r < BOARD_SIZE; r++)
+			for (int c = 0; c < BOARD_SIZE; c++)
+				usablePositions.add(new Position(r, c));
 
-		this.fireShots(shots);
+		this.myFleet.getSunkShips().forEach(ship -> usablePositions.removeAll(ship.getAdjacentPositions()));
+		this.alienMoves.forEach(move ->  usablePositions.removeAll(move.getShots()));
 
-		return Game.jsonShots(shots);
+		List<IPosition> candidateShots = new ArrayList<>(usablePositions);
+		return candidateShots;
 	}
 
 
@@ -426,41 +454,50 @@ public class Game implements IGame
 			IPosition pos;
 
 			try {
-				if (token.matches("[A-Za-z]")) {
-					// Formato separado: "A 1"
-					if (lineScanner.hasNextInt()) {
-						pos = new Position(token.toUpperCase().charAt(0), lineScanner.nextInt());
-					} else {
-						turnHistory.append("Tiro ").append(shotNumber)
-								.append(": Posição incompleta! '").append(token).append("'\n");
-						continue;
-					}
-				} else {
-					// Formato compacto: "A1"
-					Scanner s = new Scanner(token);
-					pos = Tasks.readClassicPosition(s);
-				}
+				pos = parsePosition(token, lineScanner, shotNumber, turnHistory);
+				if (pos == null) continue;
 			} catch (Exception e) {
 				turnHistory.append("Tiro ").append(shotNumber)
 						.append(": Formato inválido -> '").append(token).append("'\n");
 				continue;
 			}
 
-			if (!pos.isInside()) {
-				turnHistory.append("Tiro ").append(shotNumber)
-						.append(": Fora do tabuleiro -> ").append(pos).append("\n");
-			} else if (repeatedShot(pos)) {
-				turnHistory.append("Tiro ").append(shotNumber)
-						.append(": Repetido -> ").append(pos).append("\n");
-			} else {
-				shots.add(pos);
-				turnHistory.append("Tiro ").append(shotNumber)
-						.append(": VÁLIDO -> ").append(pos).append("\n");
-				shotNumber++;
-			}
+			shotNumber = ValidateAndAddShot(pos, turnHistory, shotNumber, shots);
 		}
 
 		return finalizeShotsAndFire(shots, turnHistory);
+	}
+
+	private int ValidateAndAddShot(IPosition pos, StringBuilder turnHistory, int shotNumber, List<IPosition> shots) {
+		if (!pos.isInside()) {
+			turnHistory.append("Tiro ").append(shotNumber)
+					.append(": Fora do tabuleiro -> ").append(pos).append("\n");
+		} else if (repeatedShot(pos)) {
+			turnHistory.append("Tiro ").append(shotNumber)
+					.append(": Repetido -> ").append(pos).append("\n");
+		} else {
+			shots.add(pos);
+			turnHistory.append("Tiro ").append(shotNumber)
+					.append(": VÁLIDO -> ").append(pos).append("\n");
+			shotNumber++;
+		}
+		return shotNumber;
+	}
+
+	private IPosition parsePosition(String token, Scanner lineScanner,
+									int shotNumber, StringBuilder turnHistory) {
+		if (token.matches("[A-Za-z]")) {
+			if (lineScanner.hasNextInt()) {
+				return new Position(token.toUpperCase().charAt(0), lineScanner.nextInt());
+			} else {
+				turnHistory.append("Tiro ").append(shotNumber)
+						.append(": Posição incompleta! '").append(token).append("'\n");
+				return null;
+			}
+		} else {
+			Scanner s = new Scanner(token);
+			return Tasks.readClassicPosition(s);
+		}
 	}
 
 	// ─────────────────────────────────────────────────────────────────────────────
@@ -512,6 +549,10 @@ public class Game implements IGame
 			alreadyShot.add(pos);
 		}
 
+		registerMove(shots, shotResults);
+	}
+
+	private void registerMove(List<IPosition> shots, List<ShotResult> shotResults) {
 		Move move = new Move(moveNumber, shots, shotResults);
 
 //		System.out.println(move);
@@ -522,6 +563,7 @@ public class Game implements IGame
 
 		moveNumber++;
 	}
+
 	// Chamar no fim da jogada para calcular o tempo
 	public void endMoveTimer() {
 		if (startMoveTime != null) {
@@ -549,12 +591,12 @@ public class Game implements IGame
 		assert pos != null;
 
 		if (!pos.isInside()) {
-			countInvalidShots++;
+			invalidShotCount++;
 			return new ShotResult(false, false, null, false);
 		}
 
 		if (isRepeated || repeatedShot(pos)) {
-			countRepeatedShots++;
+			repeatedShotCount++;
 			return new ShotResult(true, true, null, false);
 		}
 
@@ -575,13 +617,13 @@ public class Game implements IGame
 	@Override
 	public int getRepeatedShots()
 	{
-		return this.countRepeatedShots;
+		return this.repeatedShotCount;
 	}
 
 	@Override
 	public int getInvalidShots()
 	{
-		return this.countInvalidShots;
+		return this.invalidShotCount;
 	}
 
 	@Override
