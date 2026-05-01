@@ -12,6 +12,7 @@ public class ResultadoJogo {
         this.setNaviosAfundados(naviosAfundados);
     }
 
+    //123
     public int getTiros() {
         return tiros;
     }
