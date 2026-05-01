@@ -83,6 +83,16 @@ public class Move implements IMove {
 			printVerboseMessage(result.validShots(), result.repeatedShots(), sunkBoatsCount, hitsPerBoat, result.missedShots(), outsideShots);
 		}
 
+		String jsonString = BuildJsonResponse(result, outsideShots, sunkBoatsCount, hitsPerBoat);
+
+		System.out.println(jsonString);
+		System.out.println();
+
+		// Retornar o JSON
+		return jsonString;
+	}
+
+	private static String BuildJsonResponse(CountShotResults result, int outsideShots, Map<String, Integer> sunkBoatsCount, Map<String, Integer> hitsPerBoat) {
 		// Criar o mapa para o JSON
 		Map<String, Object> response = new HashMap<>();
 		response.put("validShots", result.validShots());
@@ -124,11 +134,6 @@ public class Move implements IMove {
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException("Erro ao serializar o JSON dos resultados da jogada", e);
 		}
-
-		System.out.println(jsonString);
-		System.out.println();
-
-		// Retornar o JSON
 		return jsonString;
 	}
 
