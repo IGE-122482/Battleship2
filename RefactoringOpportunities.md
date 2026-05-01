@@ -14,7 +14,7 @@
 | Move::processEnemyFire | Long Method | Extract Method (extrair construção da mensagem verbose) | 122488 |
 | Move::processEnemyFire | Long Method | Extract Method (extrair contagem dos resultados dos tiros) | 122488 |
 | Move::processEnemyFire | Long Method | Extract Method (extrair serialização do JSON de resposta) | 122488 |
-| Frigate | Duplicated Code | Extract Method (unificar cases NORTH/SOUTH e EAST/WEST no switch) | 122488 |
+| Galleon | Magic Numbers | Extract Constant (substituir magic numbers por constantes) | 122488 |
 | Fleet::getFloatingShips | Duplicated Code | Extract Method (unificar com getSunkShips usando um predicado) | 122488 |
 | Game::fireShots | Long Method | Extract Method (extrair criação e registo do Move) | 122482 |
 | Fleet::colisionRisk | Long Method | Replace Loop with Stream (substituir for por stream com anyMatch) | 122482 |
