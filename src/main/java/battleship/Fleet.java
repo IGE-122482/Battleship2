@@ -6,6 +6,7 @@ package battleship;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
+import java.util.function.Predicate;
 
 /**
  * The type Fleet.
@@ -19,6 +20,15 @@ public class Fleet implements IFleet
 	 *
 	 * @return a fully constructed and valid fleet as an instance of IFleet
 	 */
+
+	private List<IShip> filterShips(Predicate<IShip> condition) {
+		List<IShip> filtered = new ArrayList<>();
+		for (IShip s : ships)
+			if (condition.test(s))
+				filtered.add(s);
+		return filtered;
+	}
+
 	public static IFleet createRandom() {
 
 		Fleet randomFleet = new Fleet();
@@ -133,16 +143,10 @@ public class Fleet implements IFleet
      * 
      * @see battleship.IFleet#getFloatingShips()
      */
-    @Override
-    public List<IShip> getFloatingShips()
-    {
-		List<IShip> floatingShips = new ArrayList<IShip>();
-		for (IShip s : ships)
-			if (s.stillFloating())
-				floatingShips.add(s);
-
-		return floatingShips;
-    }
+	@Override
+	public List<IShip> getFloatingShips() {
+		return filterShips(IShip::stillFloating);
+	}
 
 	/**
 	 * Gets sunk ships.
@@ -155,14 +159,8 @@ public class Fleet implements IFleet
 	 * @see battleship.IFleet#getSunkShips()
 	 */
 	@Override
-	public List<IShip> getSunkShips()
-	{
-		List<IShip> sunkShips = new ArrayList<IShip>();
-		for (IShip s : ships)
-			if (!s.stillFloating())
-				sunkShips.add(s);
-
-		return sunkShips;
+	public List<IShip> getSunkShips() {
+		return filterShips(s -> !s.stillFloating());
 	}
 
 	/**
